@@ -9,6 +9,8 @@ INT32 main(INT32 argc, CHAR* argv[])
     STATUS retStatus = STATUS_SUCCESS;
     UINT32 frameSize;
     PSampleConfiguration pSampleConfiguration = NULL;
+    SignalingClientMetrics signalingClientMetrics;
+    signalingClientMetrics.version = 0;
 
 #ifndef _WIN32
     signal(SIGINT, sigintHandler);
@@ -125,6 +127,10 @@ CleanUp:
 
         if (pSampleConfiguration->enableFileLogging) {
             freeFileLogger();
+        }
+        retStatus = signalingClientGetMetrics(pSampleConfiguration->signalingClientHandle, &signalingClientMetrics);
+        if (retStatus == STATUS_SUCCESS) {
+            logSignalingClientStats(&signalingClientMetrics);
         }
         retStatus = freeSignalingClient(&pSampleConfiguration->signalingClientHandle);
         if (retStatus != STATUS_SUCCESS) {
